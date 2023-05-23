@@ -2,21 +2,21 @@ package com.prasarana.sample.service
 
 import com.prasarana.sample.models.UserModel
 import com.prasarana.sample.repository.UserRepository
-import org.mindrot.jbcrypt.BCrypt
 import org.springframework.stereotype.Service
 
 interface UserService {
     fun createUser(user: UserModel): UserModel
     fun getUser(id: Long): UserModel?
-    fun updateUser(id:Long, updatedUser: UserModel): UserModel?
+    fun updateUser(id: Long, updatedUser: UserModel): UserModel?
     fun deleteUser(id: Long)
-
+    fun findById(id: Long): UserModel?
     fun findByEmail(email: String): UserModel?
     fun loginUser(email: String, password: String): UserModel?
 
 }
+
 @Service
-class UserServiceImpl(private val userRepository: UserRepository): UserService {
+class UserServiceImpl(private val userRepository: UserRepository) : UserService {
     override fun createUser(user: UserModel): UserModel {
         return userRepository.save(user)
     }
@@ -43,21 +43,21 @@ class UserServiceImpl(private val userRepository: UserRepository): UserService {
         userRepository.deleteById(id.toInt())
     }
 
+    override fun findById(id: Long): UserModel? {
+        return userRepository.findById(id.toInt()).orElse(null)
+    }
+
     override fun findByEmail(email: String): UserModel? {
         return userRepository.findByEmail(email)
     }
 
     override fun loginUser(email: String, password: String): UserModel? {
         val user = userRepository.findByEmail(email)
-        if (user != null && _verifyPassword(password, user.password!!)) {
-            return user
-        }
+//        if (user != null && _verifyPassword(password, user.password!!)) {
+//            return user
+//        }
         return null
     }
 
-    private fun _verifyPassword(rawPassword: String, hashedPassword: String): Boolean {
-        // Implement password verification logic here, e.g., using BCrypt.checkpw()
-        return BCrypt.checkpw(rawPassword, hashedPassword)
-    }
 
 }
